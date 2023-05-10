@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.scss';
 
 // Let's talk about using index.js and some other name in the component folder.
@@ -16,17 +16,31 @@ function App(){
   const [data, setData] = useState(null);
   const [requestParams, setRequestParams] = useState({});
 
-  const callApi = (requestParams) => {
-    // mock output
-    const data = {
-      count: 2,
-      results: [
-        {name: 'fake thing 1', url: requestParams.url},
-        {name: 'fake thing 2', url: requestParams.url},
-      ],
-    };
-    setData(data);
+  const callApi = async (requestParams) => {
     setRequestParams( requestParams );
+  }
+
+  useEffect(() => {
+    console.log('fetching data', requestParams);
+      const fetchData = async() => await requestData(requestParams.url, requestParams.method)
+      .then((data)=>{
+        console.log(data);
+        setData(data);
+    })
+    if (requestParams.url){
+      fetchData();
+    }
+
+  }, [requestParams])
+
+  const requestData = async (url,  method ='GET') =>{
+    const response = await fetch(url, {
+      method: method,
+      cache: 'force-cache',
+    })
+    let results = await response.json();
+    console.log(results)
+    return results
   }
 
   return (
