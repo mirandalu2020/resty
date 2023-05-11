@@ -39,7 +39,7 @@ function App(){
       cache: 'force-cache',
     })
     let results = await response.json();
-    console.log(results)
+    console.log(response)
     return results
   }
 
