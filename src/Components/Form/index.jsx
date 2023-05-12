@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import './Form.scss';
 
-function Form({ handleApiCall }) {
+function Form({ handleApiCall, addHistory}) {
 
   const [method, setMethod] = useState('GET');
   const [url, setUrl] = useState('');
@@ -18,11 +18,12 @@ function Form({ handleApiCall }) {
     };
     console.log(formData);
     handleApiCall(formData);
+    // console.log(result);
   }
 
   const handleRequestInput = (e) => {
-    setRequestBody(e.target.value)
-    console.log(requestBody)
+    setRequestBody(e.target.value);
+    console.log(requestBody);
   }
 
   return (
@@ -45,7 +46,6 @@ function Form({ handleApiCall }) {
 
           <textarea name="user-input" data-testid='test-input' id="user-input" cols="50" rows="10" onChange={handleRequestInput}> </textarea>
         }
-
       </form>
     </>
   );

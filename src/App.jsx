@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import './App.scss';
 
 // Let's talk about using index.js and some other name in the component folder.
@@ -10,28 +10,88 @@ import Header from './Components/Header';
 import Footer from './Components/Footer';
 import Form from './Components/Form';
 import Results from './Components/Results';
+import History from './Components/History'
 
 function App(){
 
-  const [data, setData] = useState(null);
-  const [requestParams, setRequestParams] = useState({});
+  // const [data, setData] = useState(null);
+  // const [requestParams, setRequestParams] = useState({});
 
-  const callApi = async (requestParams) => {
-    setRequestParams( requestParams );
+  const initialState = {
+    history: [],
+    requestParams: {},
+    data: null
+  }
+
+  const historyReducer = (state, action) => {
+    switch(action.type) {
+      case 'ADD_HISTORY':
+        return {
+          ...state,
+          history: [...state.history, action.payload]
+        }
+      case 'ADD_DATA':
+        return {
+          ...state,
+          data: action.payload
+        }
+        case 'ADD_REQUEST':
+          return {
+            ...state,
+            requestParams: action.payload
+          }
+        default: return state
+    }
+  }
+
+  const addHistory = (history) => {
+    dispatch({
+      type: 'ADD_HISTORY', 
+      payload: history
+    })
+  }
+
+  const [state, dispatch] = useReducer(historyReducer, initialState);
+
+
+  const callApi = (requestParams) => {
+    dispatch({
+      type: 'ADD_REQUEST', 
+      payload: requestParams
+    })
   }
 
   useEffect(() => {
-    console.log('fetching data', requestParams);
-      const fetchData = async() => await requestData(requestParams.url, requestParams.method)
+    console.log('fetching data', state.requestParams);
+      const fetchData = async() => await requestData(state.requestParams.url, state.requestParams.method)
       .then((data)=>{
-        console.log(data);
         setData(data);
-    })
-    if (requestParams.url){
-      fetchData();
-    }
+        // addHistory(data);
+        console.log(data);
+    }).then(console.log('state ', state))
+    if (state.requestParams.url){
+      fetchData()}
+  }, [state.requestParams])
 
-  }, [requestParams])
+  useEffect(() => {
+    console.log('storing history', state.data);
+    if (state.data){
+      let historyItem = {
+        url: state.requestParams.url,
+        method:state.requestParams.method,
+        data: state.data
+      }
+      addHistory(historyItem)
+    }
+  }, [state.data])
+
+  const setData = (data) => {
+    // console.log(data)
+    dispatch({
+      type: 'ADD_DATA', 
+      payload: data
+    })
+  }
 
   const requestData = async (url,  method ='GET') =>{
     const response = await fetch(url, {
@@ -39,17 +99,25 @@ function App(){
       cache: 'force-cache',
     })
     let results = await response.json();
-    console.log(results)
+    console.log('RESPONSE ', results);
     return results
   }
 
   return (
     <React.Fragment>
       <Header />
-      <div>Request Method: {requestParams.method}</div>
-      <div>URL: {requestParams.url}</div>
-      <Form handleApiCall={callApi} />
-      <Results data={data} />
+      {state.requestParams &&
+      <>
+      <div>Request Method: {state.requestParams.method}</div>
+      <div>URL: {state.requestParams.url}</div>
+      </>
+      }
+      <Form handleApiCall={callApi} addHistory={addHistory}/>
+      <Results data={state.data} />
+      {/* {state.history && <History history={state.history}/>} */}
+      {state.history && state.history.map(item => {
+      return <div>{item.url}</div>
+      })}
       <Footer />
     </React.Fragment>
   )
