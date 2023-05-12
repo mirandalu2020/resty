@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { useState, useEffect, useReducer } from 'react';
 import './App.scss';
@@ -74,14 +75,15 @@ function App(){
   }, [state.requestParams])
 
   useEffect(() => {
-    console.log('storing history', state.data);
     if (state.data){
       let historyItem = {
         url: state.requestParams.url,
         method:state.requestParams.method,
         data: state.data
       }
+      console.log('storing history', historyItem);
       addHistory(historyItem)
+      console.log(state);
     }
   }, [state.data])
 
@@ -115,9 +117,9 @@ function App(){
       <Form handleApiCall={callApi} addHistory={addHistory}/>
       <Results data={state.data} />
       {/* {state.history && <History history={state.history}/>} */}
-      {state.history && state.history.map(item => {
-      return <div>{item.url}</div>
-      })}
+      {state.history && state.history.map(item => 
+      <History history={item} />
+      )}
       <Footer />
     </React.Fragment>
   )
