@@ -1,0 +1,29 @@
+$backgroundColor: #1db85e;
+$radius: 40%;
+$borderValues: 5px dashed yellow;
+
+form {
+  display: inline-block;
+  margin: auto;
+  width: auto;
+  border: $borderValues;
+  background-color: $backgroundColor;
+
+  label {
+    display: flex;
+    margin: 1rem 0;
+
+    &.methods {
+      span {
+        cursor: pointer;
+        margin: auto;
+        padding: .25rem .5rem;
+        background: #0a06e4;
+
+        &:hover, &.active {
+          background: #fff;
+        }
+      }
+    }
+  }
+}
